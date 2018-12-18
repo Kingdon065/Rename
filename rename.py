@@ -15,11 +15,11 @@ def init(args):
 		os.chdir(args.path[0])
 		arguments.append(os.path.abspath(args.path[0]))
 	else:
-		log.error('the following arguments are required: path, or the path no exists.')
+		log.error('the following arguments are required: -p/path, or the path no exists.')
 		log.info('<mr -h> get help')
 		sys.exit()
 
-	if args.prefix and args.suffix:
+	if args.prefix:
 		arguments.append(args.prefix[0])
 		arguments.append(args.suffix[0])
 	else:
@@ -32,7 +32,7 @@ def init(args):
 	elif args.regex:
 		arguments.append(args.regex[0])
 	else:
-		log.error('the following arguments are required: -1, -2 or -3')
+		log.error('the following arguments are required: -1, -2 or -e')
 		sys.exit()
 	os.makedirs('D:/Tools/mr_caches', exist_ok=True)
 	f = open('D:/Tools/mr_caches/.rename.bak', 'a+')
@@ -146,4 +146,41 @@ def deleteWords(path, text):
 		log.info('Done!')
 		sys.exit()
 	else:
+		sys.exit()
+
+def Rename_normal_files(path, prefix, suffix):
+	if os.path.exists(path) and os.path.isdir(path):
+		os.chdir(path)
+		i = 1
+		filenames = os.listdir('.')
+		width = len(str(len(filenames)))
+		newNames = {}
+		for filename in filenames:
+			new_name = f'{prefix}{i:0{width}d}{suffix}' + os.path.splitext(filename)[1]
+			if os.path.exists(new_name):
+				i = i + 1
+				continue
+			newNames[filename] = new_name
+			i = i + 1
+		log.info('重命名预览:')
+		for filename, newName in newNames.items():
+			log.info(f'{filename} to {newName}')
+
+		if not newNames:
+			log.info('新旧文件名相同，无需命名')
+			sys.exit()
+
+		flag = input('\n是否重命名(y|n): ')
+		if flag == 'y':
+			print('')
+			log.info('开始重命名...')
+			for filename, newName in newNames.items():
+				log.info(filename + ' to ' + newName)
+				shutil.move(filename, newName)
+			log.info('Done!')
+			sys.exit()
+		else:
+			sys.exit()
+	else:
+		log.info(f'[{path}] no exists or not a directory.')
 		sys.exit()

@@ -6,49 +6,50 @@ import argparse
 from rename import *
 
 def run():
-	paser = argparse.ArgumentParser(
+	parse = argparse.ArgumentParser(
 		prog='mr',
 		description='batch renaming files under a specified path'
 	)
-	paser.add_argument(
+	parse.add_argument(
 		'-p',
 		'--path',
 		nargs=1,
 		help='specify path'
 	)
-	paser.add_argument(
+	parse.add_argument(
 		'-pre',
 		'--prefix',
 		nargs=1,
 		help='specify file prefix'
 	)
-	paser.add_argument(
+	parse.add_argument(
 		'-suf',
 		'--suffix',
 		nargs=1,
+        default=[''],
 		help='specify file suffix'
 	)
-	paser.add_argument(
+	parse.add_argument(
 		'-1',
 		action='store_true',
 		dest='is_one',
 		default=False,
 		help="use regex text '\D?(\d{1,2})'"
 	)
-	paser.add_argument(
+	parse.add_argument(
 		'-2',
 		action='store_true',
 		dest='is_two',
 		default=False,
 		help="use regex text '.*[eE](\d{1,2})'"
 	)
-	paser.add_argument(
+	parse.add_argument(
 		'-e',
 		'--regex',
 		nargs=1,
 		help='specify regex'
 	)
-	paser.add_argument(
+	parse.add_argument(
 		'-L',
 		'--last',
 		action='store_true',
@@ -56,7 +57,7 @@ def run():
 		default=False,
 		help='use the last renaming method'
 	)
-	paser.add_argument(
+	parse.add_argument(
 		'-c',
 		'--cat',
 		action='store_true',
@@ -64,24 +65,37 @@ def run():
 		default=False,
 		help='show information that the last renaming methods'
 	)
-	paser.add_argument(
+	parse.add_argument(
 		'-d',
 		'--delete',
 		nargs=1,
 		help='delete words in filename, the argument required: -p/--path'
 	)
-	args = paser.parse_args()
+	parse.add_argument(
+		'-n',
+		'--normal',
+		action='store_true',
+		dest='is_normal',
+		default=False,
+		help='rename normal files'
+	)
+	args = parse.parse_args()
 
+	# 批量删除文件名中指定字符
 	if args.delete and args.path:
 		deleteWords(args.path[0], args.delete[0])
-
+	# 把非序列文件重命名成序列文件
+	if args.is_normal:
+		if args.prefix:
+			Rename_normal_files(args.path[0], args.prefix[0], args.suffix[0])
+	# 查看上一次重命名的方法信息
 	if args.is_cat:
 		ar = last()
 		for n in ar:
 			print(n)
 		print('')
 		sys.exit()
-
+	# 使用上一次重命名的方法
 	if args.is_last:
 		ar = last()
 		filenames = show_rename_files()
